@@ -289,6 +289,8 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
+
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
@@ -296,7 +298,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        return [self.startingPosition,set()] #set() of visited corners so corners don't get double counted
+        return (self.startingPosition, self.corners) #keep track of unvisited corners
 
     def isGoalState(self, state):
         """
@@ -304,11 +306,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         corners = state[1]
-
-        if state[0] in self.corners: #if the current node is the last corner add it to the set()
-            corners.add(state[0])
-
-        return len(corners) == 4
+        return len(list(corners)) == 0
 
     def getSuccessors(self, state):
         """
@@ -320,6 +318,8 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
+        node = state[0]
+        corners = state[1]
 
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
@@ -331,7 +331,18 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+           
+            x,y = node
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                nextState = (nextx,nexty)
+                successor_corners = corners
+                if nextState in successor_corners:
+                    successor_corners = tuple(c for c in successor_corners if c != nextState) # make a new tuple without nextstate because that corner has been visited
 
+                successors.append(((nextState,successor_corners),action,1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 

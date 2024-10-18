@@ -1,3 +1,4 @@
+
 # search.py
 # ---------
 # Licensing Information:  You are free to use or extend these projects for
@@ -109,7 +110,6 @@ def depthFirstSearch(problem: SearchProblem):
 
         
 
-    util.raiseNotDefined()
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
@@ -135,16 +135,24 @@ def breadthFirstSearch(problem: SearchProblem):
             for child_node,action,_ in problem.getSuccessors(node):
                 fringe.push((child_node, path+[action])) 
 
-    util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    fringe = util.Queue()
+    fringe = util.PriorityQueue()
     closed = set()
 
-    fringe.push(((problem.getStartState()),[]))
-    
+    fringe.push(((problem.getStartState()),[]),0)
+
+    # x,y = problem.getSuccessors(fringe.pop()[0])
+
+    # print(f"this is x:{x}, this is y:{y}")
+
+    # fringe.push(x,5)
+    # fringe.push(y,0)
+
+    # print(fringe.pop())
+
 
     while(True):
         if fringe.isEmpty():
@@ -158,8 +166,8 @@ def uniformCostSearch(problem: SearchProblem):
         if node not in closed:
             closed.add(node)
             for child_node,action,_ in problem.getSuccessors(node):
-                fringe.push((child_node, path+[action])) 
-    util.raiseNotDefined()
+                
+                fringe.push((child_node, path+[action]),problem.getCostOfActions( path+[action])) 
 
 def nullHeuristic(state, problem=None):
     """
@@ -171,7 +179,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueue()
+    closed = set()
+
+    fringe.push(((problem.getStartState()),[]),heuristic(problem.getStartState(),problem))
+
+
+    while(True):
+        if fringe.isEmpty():
+            return "Failure: No path found"
+        
+        node, path = fringe.pop()
+
+        if problem.isGoalState(node):
+            return path
+        
+        if node not in closed:
+            closed.add(node)
+            for child_node,action,_ in problem.getSuccessors(node):
+                
+                heuristic_cost = problem.getCostOfActions( path+[action]) + heuristic(child_node,problem)
+                fringe.push((child_node, path+[action]), heuristic_cost) 
+
 
 
 # Abbreviations
