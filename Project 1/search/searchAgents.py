@@ -390,7 +390,7 @@ def cornersHeuristic(state, problem):
         dist = util.manhattanDistance(pos, corner)
         distances.append(dist)
 
-    return max(distances) #returning max to maintain consistency and admissibility
+    return max(distances) #returning max to maintain admissibility
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -454,6 +454,7 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -484,7 +485,20 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    foodGrid = foodGrid.asList()
+
+    if len(foodGrid) == 0:
+        return 0
+    
+    distances = []
+    for food in foodGrid:
+        dist = util.manhattanDistance(position, food)
+        distances.append(dist)
+
+
+    
+    return max(distances)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
