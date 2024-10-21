@@ -492,13 +492,18 @@ def foodHeuristic(state, problem):
         return 0
     
     distances = []
-    for food in foodGrid:
+    for food in foodGrid: #used for finding the smallest distance from state to food
         dist = util.manhattanDistance(position, food)
         distances.append(dist)
 
+    max_dis_apart = [] #used to find the largest distance between 2 food items
+    for food1 in foodGrid:
+        for food2 in foodGrid:
+            dist = util.manhattanDistance(food1, food2)
+            max_dis_apart.append(dist)
 
     
-    return max(distances)
+    return min(distances) + max(max_dis_apart) #adding the two allows for more admissible and consistent heuristic
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
