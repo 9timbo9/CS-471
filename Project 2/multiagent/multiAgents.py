@@ -88,11 +88,11 @@ class ReflexAgent(Agent):
 
         dis_from_ghost = []
         for ghosts in newGhostStates:
-            dis_from_ghost.append(util.manhattanDistance(newPos,ghosts.getPosition()))
+            dis_from_ghost.append(manhattanDistance(newPos,ghosts.getPosition()))
         
         dis_from_food = []
         for food in newFood:
-            dis_from_food.append(util.manhattanDistance(newPos,food))
+            dis_from_food.append(manhattanDistance(newPos,food))
         
 
         
@@ -323,47 +323,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 move = action
 
         return move
-
+    
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: <Almost the same as the initial evaluation function but now I take advantage of the ghosts scareTimer>
     """
     "*** YOUR CODE HERE ***"
-    successorGameState = currentGameState.generatePacmanSuccessor(action)
-    newPos = successorGameState.getPacmanPosition()
-    newFood = successorGameState.getFood()
-    newGhostStates = successorGameState.getGhostStates()
-    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    newPos = currentGameState.getPacmanPosition()
+    newFood = currentGameState.getFood()
+    newGhostStates = currentGameState.getGhostStates()
 
+    score = currentGameState.getScore() 
 
-    newFood = newFood.asList()
+    dis_to_food = [manhattanDistance(newPos, foodPos) for foodPos in newFood.asList()]
+    if len(dis_to_food) > 0: # added this to prevent an empty min() arguement error 
+        score += 10.0 / min(dis_to_food)
 
-    LARGE_POSITIVE = float('inf')
+    for ghost in newGhostStates:
+        distance = manhattanDistance(newPos, ghost.getPosition())
+        if distance > 0:
+            if ghost.scaredTimer > 0: #prioritize when ghosts are scare
+                score += 100 / distance
+            else:  
+                score += -10.0 / distance
+        else:
+            return -100000000.0 #the game ends at this point
 
-    if len(newFood) == 0:
-        return LARGE_POSITIVE
+    return score
 
-    dis_from_ghost = []
-    for ghosts in newGhostStates:
-        dis_from_ghost.append(util.manhattanDistance(newPos,ghosts.getPosition()))
-    
-    dis_from_food = []
-    for food in newFood:
-        dis_from_food.append(util.manhattanDistance(newPos,food))
-    
-
-    
-    ghostPenalty = 0
-    if min(dis_from_ghost) > 0:
-        ghostPenalty = 1.0 /max(min(dis_from_ghost), 1)
-
-    foodReward = 10.0 / max(min(dis_from_food), 1)  
-
-    
-    #This orientation for the return passed all the test for me
-    return successorGameState.getScore() + foodReward - ghostPenalty * 4
-# Abbreviation
 better = betterEvaluationFunction
